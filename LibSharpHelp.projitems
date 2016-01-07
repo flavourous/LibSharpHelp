@@ -11,5 +11,6 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)CollectionHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StringHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)StreamReadingHelper.cs" />
   </ItemGroup>
 </Project>
