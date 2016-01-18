@@ -20,6 +20,13 @@ namespace LibSharpHelp
 		{
 			return listCreator(from s in myself select creator(s));
 		}
+		public static bool Contains<T>(this IEnumerable<T> items, T item) where T : class
+		{
+			foreach (T i in items)
+				if (i.Equals (item))
+					return true;
+			return false;
+		}
 		public static void RemoveAll(this IList list, params Object[] items)
 		{
 			foreach (var t in items)

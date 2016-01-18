@@ -21,6 +21,15 @@ namespace LibSharpHelp
 			String units;
 			return "To fix. FIXME.";
 		}
+		public static String WithSuffix(this int num)
+		{
+			int fd = num % 10;
+			String suf = "th";
+			if (fd == 1) suf = "st";
+			else if (fd == 2) suf = "nd";
+			else if (fd == 3) suf = "rd";
+			return num + suf;
+		}
 	}
 }
 

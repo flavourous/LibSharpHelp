@@ -12,5 +12,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)CollectionHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StringHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StreamReadingHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NumericHelpers.cs" />
   </ItemGroup>
 </Project>
