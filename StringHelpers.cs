@@ -11,15 +11,19 @@ namespace LibSharpHelp
 		}
 		delegate ARet AmtGetter(TimeSpan input);
 		static readonly List<AmtGetter> amounters = new List<AmtGetter> {
-			ts => new ARet(ts.Minutes != 0, ts.TotalMinutes, "Minutes"),
-			ts => new ARet(ts.Hours != 0, ts.TotalHours, "Hours"),
+			ts => new ARet(ts.Days % 7 == 0 && ts.Days > 0, ts.TotalDays / 7, "Weeks"),
 			ts => new ARet(ts.Days != 0, ts.TotalDays, "Days"),
+			ts => new ARet(ts.Hours != 0, ts.TotalHours, "Hours"),
+			ts => new ARet(ts.Minutes != 0, ts.TotalMinutes, "Minutes"),
+			ts => new ARet(true, 0, "Zero"),
 		};
 		public static String WithSuffix(this TimeSpan self)
 		{
-			double amount;
-			String units;
-			return "To fix. FIXME.";
+			ARet ar = null;
+			foreach (var aa in amounters)
+				if ((ar = aa (self)).success)
+					break;
+			return String.Format ("{0} {1}", ar.amount.ToString ("F0"), ar.units);
 		}
 		public static String WithSuffix(this int num)
 		{

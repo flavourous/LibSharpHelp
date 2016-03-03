@@ -91,9 +91,9 @@ namespace LibSharpHelp
 	}
 	public class ListEnumerator<T> : IEnumerator<T>
 	{
-		readonly IReadOnlyList<T> dd;
+		readonly IList<T> dd;
 		int st = -1;
-		public ListEnumerator(IReadOnlyList<T> dd)
+		public ListEnumerator(IList<T> dd)
 		{
 			this.dd = dd;
 		}
@@ -107,9 +107,9 @@ namespace LibSharpHelp
 		{
 			st = 0; 
 		}
-		T current { get { return dd [st]; } }
+		protected virtual T current { get { return dd [st]; } }
 		object IEnumerator.Current { get { return current; } }
-		public virtual T Current { get { return current; } }
+		public T Current { get { return current; } }
 		#endregion
 		public void Dispose () { }
 	}
