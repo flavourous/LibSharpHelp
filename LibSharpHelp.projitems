@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
@@ -9,9 +9,12 @@
     <Import_RootNamespace>LibSharpHelp</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)BindingList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CollectionHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObfuscationAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StringHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StreamReadingHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NumericHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TaskHelpers.cs" />
   </ItemGroup>
 </Project>
