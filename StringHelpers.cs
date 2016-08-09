@@ -1,11 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace LibSharpHelp
 {
 	public static class FormattingExtensions
 	{
-		class ARet {
+        public static String ToNiceAscii(this string friendlyname)
+        {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < friendlyname.Length; i++)
+            {
+                var c = friendlyname[i];
+                sb.Append((c < 17 || c > 128) ? '_' : c);
+            }
+            return sb.ToString();
+        }
+
+
+        class ARet {
 			public readonly bool success; public readonly double amount; public readonly String units;  
 			public ARet(bool success, double amount, String units) { this.success=success; this.amount=amount; this.units=units; }
 		}

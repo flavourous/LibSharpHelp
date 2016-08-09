@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)BindingList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CollectionHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ExpressionHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObfuscationAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StringHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StreamReadingHelper.cs" />

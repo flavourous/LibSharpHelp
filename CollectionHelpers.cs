@@ -7,6 +7,30 @@ namespace LibSharpHelp
 {
 	public static class EnumerableExtenstions
 	{
+        /// <summary>
+        /// performs cross action.  returns false when unequal lengths.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="A"></typeparam>
+        /// <param name="self"></param>
+        /// <param name="other"></param>
+        /// <param name="each"></param>
+        /// <returns></returns>
+        public static bool Both<T,A>(this IEnumerable<T> self, IEnumerable<A> other, Action<T,A> each)
+        {
+            var es = self.GetEnumerator();
+            var eo = other.GetEnumerator();
+            bool ees, eeo;
+            ees = es.MoveNext();
+            eeo = eo.MoveNext();
+            while (ees && eeo)
+            {
+                each(es.Current, eo.Current);
+                ees = es.MoveNext();
+                eeo = eo.MoveNext();
+            }
+            return ees == eeo;
+        }
 		public static List<Out> MakeList<In,Out>(this IEnumerable<In> myself, Func<In, Out> creator)
 		{
 			return new List<Out>(from s in myself select creator(s));
