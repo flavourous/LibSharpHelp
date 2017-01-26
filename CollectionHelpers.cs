@@ -18,20 +18,27 @@ namespace LibSharpHelp
         /// <returns></returns>
         public static bool Both<T,A>(this IEnumerable<T> self, IEnumerable<A> other, Action<T,A> each)
         {
-            var es = self.GetEnumerator();
-            var eo = other.GetEnumerator();
-            bool ees, eeo;
-            ees = es.MoveNext();
-            eeo = eo.MoveNext();
-            while (ees && eeo)
+            using (var es = self.GetEnumerator())
+            using (var eo = other.GetEnumerator())
             {
-                each(es.Current, eo.Current);
+                bool ees, eeo;
                 ees = es.MoveNext();
                 eeo = eo.MoveNext();
+                while (ees && eeo)
+                {
+                    each(es.Current, eo.Current);
+                    ees = es.MoveNext();
+                    eeo = eo.MoveNext();
+                }
+                return ees == eeo;
             }
-            return ees == eeo;
         }
-		public static List<Out> MakeList<In,Out>(this IEnumerable<In> myself, Func<In, Out> creator)
+        public static void Act<T>(this IEnumerable<T> self, Action<T> each)
+        {
+            foreach (var t in self) each(t);
+        }
+
+        public static List<Out> MakeList<In,Out>(this IEnumerable<In> myself, Func<In, Out> creator)
 		{
 			return new List<Out>(from s in myself select creator(s));
 		}
@@ -43,6 +50,10 @@ namespace LibSharpHelp
 		{
 			return listCreator(from s in myself select creator(s));
 		}
+        public static IEnumerable<KeyValuePair<T2k, T2v>> ToKeyValue<T1, T2v, T2k>(this IEnumerable<T1> @this, Func<T1, T2k> key, Func<T1, T2v> value)
+        {
+            return @this.Select(d => new KeyValuePair<T2k, T2v>(key(d), value(d)));
+        }
 		public static bool Contains<T>(this IEnumerable<T> items, T item) where T : class
 		{
 			foreach (T i in items)

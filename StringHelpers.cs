@@ -6,6 +6,30 @@ namespace LibSharpHelp
 {
 	public static class FormattingExtensions
 	{
+        public static IEnumerable<String> QuotedSplit(this String s, char split, params char[] quote)
+        {
+            HashSet<char> qq = new HashSet<char>(quote);
+            StringBuilder rv = new StringBuilder();
+            bool inquote = false;
+            char currentq = (char)0;
+            for (int i = 0; i < s.Length; i++)
+            {
+                char c = s[i];
+                if (c == split && !inquote)
+                {
+                    yield return rv.ToString();
+                    rv.Clear();
+                }
+                else if (qq.Contains(c) && (!inquote || c == currentq))
+                {
+                    currentq = c;
+                    inquote = !inquote;
+                }
+                else rv.Append(c);
+            }
+            yield return rv.ToString();
+        }
+
         public static String ToNiceAscii(this string friendlyname)
         {
             StringBuilder sb = new StringBuilder();

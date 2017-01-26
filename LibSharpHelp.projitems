@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)CollectionHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExpressionHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObfuscationAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SQLiteNetHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StringHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StreamReadingHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)NumericHelpers.cs" />
