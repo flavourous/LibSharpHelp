@@ -54,7 +54,7 @@ namespace LibSharpHelp
         {
             return @this.Select(d => new KeyValuePair<T2k, T2v>(key(d), value(d)));
         }
-		public static bool Contains<T>(this IEnumerable<T> items, T item) where T : class
+		public static bool RContains<T>(this IEnumerable<T> items, T item) where T : class
 		{
 			foreach (T i in items)
 				if (i.Equals (item))
