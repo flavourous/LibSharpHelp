@@ -9,7 +9,6 @@
     <Import_RootNamespace>LibSharpHelp</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)BindingList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CollectionHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExpressionHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ObfuscationAttribute.cs" />

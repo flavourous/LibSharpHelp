@@ -2,9 +2,70 @@
 using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 
 namespace LibSharpHelp
 {
+    public interface ICanDispatch
+    {
+        Action<Action> Dispatcher { get; set; }
+    }
+    public class DispatchedObservableCollection<T> : ObservableCollection<T>, ICanDispatch
+    {
+        Object sync = new object();
+        bool NotifyBlocked = false;
+        bool Notify = true;
+        protected void SuspendNotifications()
+        {
+            lock(sync) Notify = false;
+        }
+        protected void ResumeNotifications()
+        {
+            lock (sync)
+            {
+                Notify = true;
+                if (NotifyBlocked)
+                {
+                    OnPropertyChanged( new PropertyChangedEventArgs("Count"));
+                    OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));
+                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                    NotifyBlocked = false;
+                }
+            }
+        }
+        public Action<Action> Dispatcher { get; set; } = a => a();
+        public override event NotifyCollectionChangedEventHandler CollectionChanged = delegate { };
+        protected override event PropertyChangedEventHandler PropertyChanged = delegate { };
+        protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            lock (sync)
+            {
+                if (Notify) Dispatcher(() => PropertyChanged(this, e));
+                else NotifyBlocked = true;
+            }
+        }
+        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            lock (sync)
+            {
+                if (Notify) Dispatcher(() => CollectionChanged(this, e));
+                else NotifyBlocked = true;
+            }
+        }
+    }
+
+    public static class HashUtil
+    {
+        public static int CombineHashCodes(params object[] objects)
+        {
+            int hash = 17;
+            foreach(var o in objects)
+                hash = hash * 31 + o.GetHashCode();
+            return hash;
+        }
+    }
 	public static class EnumerableExtenstions
 	{
         /// <summary>
@@ -42,10 +103,6 @@ namespace LibSharpHelp
 		{
 			return new List<Out>(from s in myself select creator(s));
 		}
-		public static BindingList<Out> MakeBindingList<In,Out>(this IEnumerable<In> myself, Func<In, Out> creator)
-		{
-			return new BindingList<Out>(new List<Out>(from s in myself select creator(s)));
-		}
 		public static TList MakeSomething<In,Out,TList>(this IEnumerable<In> myself, Func<In, Out> creator, Func<IEnumerable<Out>,TList> listCreator)
 		{
 			return listCreator(from s in myself select creator(s));
@@ -61,7 +118,7 @@ namespace LibSharpHelp
 					return true;
 			return false;
 		}
-		public static void RemoveAll(this IList list, params Object[] items)
+		public static void RemoveAll<T>(this IList<T> list, params T[] items)
 		{
 			foreach (var t in items)
 				list.Remove (t);
@@ -76,12 +133,12 @@ namespace LibSharpHelp
 			foreach (var t in items)
 				list.Add (t);
 		}
-		public static void Add(this IList list, params Object[] items)
+		public static void Add<T>(this IList<T> list, params T[] items)
 		{
 			for (int i = 0; i < items.Length; i++)
 				list.Add (items [i]);
 		}
-		public static void Ensure(this IList list, int index, params Object[] items)
+		public static void Ensure<T>(this IList<T> list, int index, params T[] items)
 		{
 			int lindex = index;
 			foreach (var t in items) 
