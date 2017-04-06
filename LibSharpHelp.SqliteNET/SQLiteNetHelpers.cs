@@ -1,6 +1,4 @@
-﻿#if HELP_SQLITENET
-
-using SQLite.Net;
+﻿using SQLite.Net;
 using SQLite.Net.Attributes;
 using System;
 using System.Collections.Generic;
@@ -254,4 +252,3 @@ namespace LibSharpHelp
         }
     }
 }
-#endif
