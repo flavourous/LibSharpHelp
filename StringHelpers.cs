@@ -30,6 +30,12 @@ namespace LibSharpHelp
             yield return rv.ToString();
         }
 
+        public static String ToCapital(this string s)
+        {
+            if (s.Length == 0) return s;
+            return s.Substring(0, 1).ToUpper() + s.Substring(1);
+        }
+
         public static String ToNiceAscii(this string friendlyname)
         {
             StringBuilder sb = new StringBuilder();
@@ -41,10 +47,9 @@ namespace LibSharpHelp
             return sb.ToString();
         }
 
-
         class ARet {
-			public readonly bool success; public readonly double amount; public readonly String units;  
-			public ARet(bool success, double amount, String units) { this.success=success; this.amount=amount; this.units=units; }
+			public readonly bool success; public readonly double? amount; public readonly String units;  
+			public ARet(bool success, double? amount, String units) { this.success=success; this.amount=amount; this.units=units; }
 		}
 		delegate ARet AmtGetter(TimeSpan input);
 		static readonly List<AmtGetter> amounters = new List<AmtGetter> {
@@ -52,7 +57,7 @@ namespace LibSharpHelp
 			ts => new ARet(ts.Days != 0, ts.TotalDays, "days"),
 			ts => new ARet(ts.Hours != 0, ts.TotalHours, "hours"),
 			ts => new ARet(ts.Minutes != 0, ts.TotalMinutes, "minutes"),
-			ts => new ARet(true, 0, "zero"),
+			ts => new ARet(true, ts.TotalSeconds, "seconds"),
 		};
 		public static String WithSuffix(this TimeSpan self, bool numeric_singular = false)
 		{
@@ -62,7 +67,7 @@ namespace LibSharpHelp
 					break;
             bool o = ar.amount == 1.0;
 			return String.Format ("{0}{1}", 
-                o && !numeric_singular ? "" : ar.amount.ToString ("F0") + " ", 
+                o && !numeric_singular ? "" : ar.amount.HasValue ? (ar.amount.Value.ToString ("F0") + " ") : "", 
                 o ? ar.units.Substring(0, ar.units.Length-1) : ar.units
                 );
 		}
