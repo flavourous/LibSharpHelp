@@ -8,6 +8,42 @@ using System.ComponentModel;
 
 namespace LibSharpHelp
 {
+    public class TaggedObservableCollection<T> : ObservableCollection<T> where T : class
+    {
+        readonly T tag;
+        public TaggedObservableCollection(T tag, IList<T> source)
+        {
+            this.tag = tag;
+            if(source is ObservableCollection<T>)
+                (source as ObservableCollection<T>).CollectionChanged += Source_CollectionChanged;
+            Source_CollectionChanged(null,null);
+        }
+        Object raiselock = new object();
+        bool fix_in_progress = false;
+        private void Source_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            // Interlocking checking for nothing item.
+            lock (raiselock)
+            {
+                // Do the thing you were going to do...
+                if (sender != null) CollectionChanged(sender, e);
+                bool is_ok = Count > 0 && this[0] == tag;
+                if (!is_ok && !fix_in_progress)
+                {
+                    fix_in_progress = true;
+                    Remove(tag); // might be in wrong order...
+                    Insert(0, tag);
+                    fix_in_progress = false;
+                }
+            }
+        }
+
+        protected override event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public override event NotifyCollectionChangedEventHandler CollectionChanged = delegate { };
+
+        
+    }
+
     public interface ICanDispatch
     {
         Action<Action> Dispatcher { get; set; }
