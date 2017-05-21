@@ -5,17 +5,20 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace LibSharpHelp
 {
+    
     public class TaggedObservableCollection<T> : ObservableCollection<T> where T : class
     {
         readonly T tag;
         public TaggedObservableCollection(T tag, IList<T> source)
         {
             this.tag = tag;
-            if(source is ObservableCollection<T>)
-                (source as ObservableCollection<T>).CollectionChanged += Source_CollectionChanged;
+            if(source is INotifyCollectionChanged)
+                (source as INotifyCollectionChanged).CollectionChanged += Source_CollectionChanged;
+            this.AddAll(source);
             Source_CollectionChanged(null,null);
         }
         Object raiselock = new object();
@@ -26,7 +29,27 @@ namespace LibSharpHelp
             lock (raiselock)
             {
                 // Do the thing you were going to do...
-                if (sender != null) CollectionChanged(sender, e);
+                if (sender != null)
+                {
+                    switch (e.Action)
+                    {
+                        case NotifyCollectionChangedAction.Add:
+                            this.InsertAll(e.NewStartingIndex, e.NewItems.Cast<T>());
+                            break;
+                        case NotifyCollectionChangedAction.Remove:
+                            foreach (var nt in e.OldItems)
+                                RemoveAt(e.OldStartingIndex);
+                            break;
+                        case NotifyCollectionChangedAction.Reset:
+                            Clear();
+                            this.AddAll(sender as IEnumerable<T>);
+                            break;
+                        default:
+                        case NotifyCollectionChangedAction.Replace:
+                        case NotifyCollectionChangedAction.Move:
+                            throw new NotImplementedException();
+                    }
+                }
                 bool is_ok = Count > 0 && this[0] == tag;
                 if (!is_ok && !fix_in_progress)
                 {
@@ -37,11 +60,6 @@ namespace LibSharpHelp
                 }
             }
         }
-
-        protected override event PropertyChangedEventHandler PropertyChanged = delegate { };
-        public override event NotifyCollectionChangedEventHandler CollectionChanged = delegate { };
-
-        
     }
 
     public interface ICanDispatch
@@ -64,7 +82,7 @@ namespace LibSharpHelp
                 Notify = true;
                 if (NotifyBlocked)
                 {
-                    OnPropertyChanged( new PropertyChangedEventArgs("Count"));
+                    OnPropertyChanged(new PropertyChangedEventArgs("Count"));
                     OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));
                     OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
                     NotifyBlocked = false;
@@ -104,6 +122,13 @@ namespace LibSharpHelp
     }
 	public static class EnumerableExtenstions
 	{
+        public static void LogHook(this IEnumerable c, string n)
+        {
+            if (c is INotifyPropertyChanged)
+                (c as INotifyPropertyChanged).PropertyChanged += (o, e) => Debug.WriteLine("{0}.{1} changed", n, e?.PropertyName);
+            if (c is INotifyCollectionChanged)
+                (c as INotifyCollectionChanged).CollectionChanged += (o, e) => Debug.WriteLine("{0}:CollectionChanged:{3} new:{1} old:{2}", n, e?.NewItems?.Count??0, e?.OldItems?.Count??0, e?.Action.ToString()??"");
+        }
         /// <summary>
         /// performs cross action.  returns false when unequal lengths.
         /// </summary>
@@ -159,12 +184,17 @@ namespace LibSharpHelp
 			foreach (var t in items)
 				list.Remove (t);
 		}
-		public static void AddAll<T>(this IList<T> list, IEnumerable<T> items)
-		{
-			foreach (var t in items)
-				list.Add (t);
-		}
-		public static void AddAll<T>(this IList<T> list, params T[] items)
+        public static void AddAll<T>(this IList<T> list, IEnumerable<T> items)
+        {
+            foreach (var t in items)
+                list.Add(t);
+        }
+        public static void InsertAll<T>(this IList<T> list,int index, IEnumerable<T> items)
+        {
+            foreach (var t in items.Reverse())
+                list.Insert(index, t);// fixme could be faster? depends on list impl
+        }
+        public static void AddAll<T>(this IList<T> list, params T[] items)
 		{
 			foreach (var t in items)
 				list.Add (t);

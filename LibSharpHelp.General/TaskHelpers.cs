@@ -6,34 +6,7 @@ using System.Threading.Tasks;
 
 namespace LibSharpHelp
 {
-    public class TaskWrappedAction
-    {
-        public Task current { get; private set; }
-        readonly Action work;
-        public TaskWrappedAction(Action work)
-        {
-            this.work = work;
-        }
-        [DebuggerStepThrough]
-        public void Work()
-        {
-            TaskCompletionSource<int> ti = new TaskCompletionSource<int>();
-            current = ti.Task;
-            try
-            {
-                work();
-                ti.SetResult(0);
-            }
-#if !DEBUG
-            catch (Exception e)
-            {
-                ti.SetException(e);
-                throw;
-            }
-#endif
-            finally { }
-        }
-    }
+
     public static class TaskHelpers
     {
         public static Task ContinueAfter(this Task current, Func<Task> after)

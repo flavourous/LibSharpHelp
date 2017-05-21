@@ -109,8 +109,9 @@ namespace LibSharpHelp
                 throw new ArgumentException("Sync must support recursion");
             this.Sync = Sync;
             this.cconn = conn;
-            using(Sync.WriteLock())
-                conn.CreateTable<KeyToIndex>();
+            if(conn.GetTableInfo(conn.GetMapping<KeyToIndex>().TableName).Count == 0)
+                using(Sync.WriteLock())
+                    conn.CreateTable<KeyToIndex>();
             this.from_mid = from_mid;
             this.from_pid = from_pid;
             this.from_pk = from_pk;

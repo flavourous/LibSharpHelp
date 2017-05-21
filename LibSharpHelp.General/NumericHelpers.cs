@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LibSharpHelp
 {
-	static class ConvertHelp
+	public static class ConvertHelp
 	{
         public static IEnumerable<uint> SplitAsFlags(this uint value)
         {
