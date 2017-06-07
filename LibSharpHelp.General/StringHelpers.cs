@@ -59,18 +59,38 @@ namespace LibSharpHelp
 			ts => new ARet(ts.Minutes != 0, ts.TotalMinutes, "minutes"),
 			ts => new ARet(true, ts.TotalSeconds, "seconds"),
 		};
-		public static String WithSuffix(this TimeSpan self, bool numeric_singular = false)
-		{
-			ARet ar = null;
-			foreach (var aa in amounters)
-				if ((ar = aa (self)).success)
-					break;
+        static readonly List<AmtGetter> preamounters = new List<AmtGetter> {
+            ts => new ARet(ts.Days % 7 == 0 && ts.Days > 0, ts.TotalDays / 7, "weekly"),
+            ts => new ARet(ts.Days != 0, ts.TotalDays, "daily"),
+            ts => new ARet(ts.Hours != 0, ts.TotalHours, "hourly"),
+            ts => new ARet(ts.Minutes != 0, ts.TotalMinutes, "minutely"),
+            ts => new ARet(true, ts.TotalSeconds, "secondly"),
+        };
+        public static String WithSuffix(this TimeSpan self, bool numeric_singular = false)
+        {
+            ARet ar = null;
+            foreach (var aa in amounters)
+                if ((ar = aa(self)).success)
+                    break;
             bool o = ar.amount == 1.0;
-			return String.Format ("{0}{1}", 
-                o && !numeric_singular ? "" : ar.amount.HasValue ? (ar.amount.Value.ToString ("F0") + " ") : "", 
-                o ? ar.units.Substring(0, ar.units.Length-1) : ar.units
+            return String.Format("{0}{1}",
+                o && !numeric_singular ? "" : ar.amount.HasValue ? (ar.amount.Value.ToString("F0") + " ") : "",
+                o ? ar.units.Substring(0, ar.units.Length - 1) : ar.units
                 );
-		}
+        }
+        public static String WithPrefix(this TimeSpan self, bool numeric_singular = false)
+        {
+            ARet ar = null;
+            foreach (var aa in preamounters)
+                if ((ar = aa(self)).success)
+                    break;
+            bool o = ar.amount == 1.0;
+            return String.Format("{0}{1}",
+                o && !numeric_singular ? "" : ar.amount.HasValue ? (ar.amount.Value.ToString("F0") + " ") : "",
+                ar.units
+                );
+        }
+        
         public static string Suffix(this int num)
         {
             int fd = num % 10;

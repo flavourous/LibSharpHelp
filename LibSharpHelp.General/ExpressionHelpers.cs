@@ -5,8 +5,12 @@ using System.Text;
 
 namespace LibSharpHelp
 {
-    class ExpressionHelpers
+    public static class ExpressionHelpers
     {
-       
+        public static void CastAct<T>(this Object o, Action<T> act, Action fail = null)
+        {
+            if (o is T) act((T)o);
+            else fail?.Invoke();
+        }
     }
 }

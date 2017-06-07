@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading;
 using System.Collections;
+using System.Diagnostics;
 
 namespace LibSharpHelp
 {
@@ -132,16 +133,19 @@ namespace LibSharpHelp
         }
         void Execute(String q)
         {
+            Debug.WriteLine(q);
             using(Sync.ReadLock())
                 cconn.Execute(q);
         }
         X Scalar<X>(String q)
         {
+            Debug.WriteLine(q);
             using (Sync.ReadLock())
                 return cconn.ExecuteScalar<X>(q);
         }
         IEnumerable<X> Command<X>(String c, TableMapping map = null, params object[] args)
         {
+            Debug.WriteLine(c + "\r\n -- with -- \r\n" + String.Join(", ", args));
             var cc = cconn.CreateCommand(c, args);
             var ret = map == null ? cc.ExecuteQuery<X>() : cc.ExecuteQuery<X>(map);
             return new LockedEnumerable<X>(ret, Sync);
